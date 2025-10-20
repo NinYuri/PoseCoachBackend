@@ -64,7 +64,7 @@ def send_sms(usr):
         No lo compartas con nadie por seguridad.
         
         Atte.
-        PoseCoach ❤
+        PoseCoach
         """
 
         # Enviar SMS
@@ -97,7 +97,7 @@ def forgot_password_sms(usr):
         Si no solicitaste un restablecimiento de contrasena, ignora este mensaje.
 
         Atentamente,  
-        PoseCoach ❤
+        PoseCoach
         """
 
         # Enviar SMS

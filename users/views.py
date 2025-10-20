@@ -118,6 +118,19 @@ class ResendOTPView(APIView):
             return Response({"error": f"No se pudo enviar el OTP por {metodo}: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class CheckUsernameView(APIView):
+    def post(self, request):
+        username = request.data.get('username', '').strip()
+
+        if not username:
+            return Response({"available": False, "error": "El usuario es requerido"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if CustomUser.objects.filter(username=username).exists():
+            return Response({"available": False, "mensaje": "Este nombre de usuario ya está en uso"}, status=status.HTTP_200_OK)
+
+        return Response({"available": True}, status=status.HTTP_200_OK)
+
+
 class CompleteRegisterView(APIView):
     def post(self, request):
         temporal_id = request.data.get('temporal_id')
