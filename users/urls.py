@@ -11,7 +11,8 @@ from users.views import (InitialRegisterView,
                          ForgotPasswordView,
                          ResetPasswordView,
                          ProfileUpdateView,
-                         ProfileView )
+                         ProfileView,
+                         ResendOTPPassView)
 
 urlpatterns = [
     # Register
@@ -31,6 +32,7 @@ urlpatterns = [
     # Password
     path('forgot/', ForgotPasswordView.as_view(), name='forgot_password'),
     path('reset/', ResetPasswordView.as_view(), name='reset_password'),
+    path('password/otp/', ResendOTPPassView.as_view(), name='password_otp'),
 
     # Profile
     path('profile/', ProfileView.as_view(), name='profile'),

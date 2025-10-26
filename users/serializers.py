@@ -273,7 +273,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"No se pudo enviar código OTP: {str(e)}")
 
         attrs["user"] = user
-        return user
+        return attrs
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -323,6 +323,9 @@ class ResetPasswordSerializer(serializers.Serializer):
                 user = CustomUser.objects.get(phone=phone)
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError("Usuario no encontrado")
+
+        if user.check_password(new_password):
+            raise serializers.ValidationError("La nueva contraseña no puede ser igual a la anterior")
 
         if user.otp_code != otp:
             raise serializers.ValidationError("Código OTP incorrecto")

@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from users.models import CustomUser
 from users.serializers import UserRegisterInitialSerializer, UserCompleteProfileSerializer, UserLoginSerializer, \
     ForgotPasswordSerializer, ResetPasswordSerializer, ProfileUpdateSerializer
-from users.utilities.utils import send_email, send_sms, method
+from users.utilities.utils import send_email, send_sms, method, forgot_password_email, forgot_password_sms
 
 
 class InitialRegisterView(APIView):
@@ -187,9 +187,11 @@ class ForgotPasswordView(APIView):
         serializer = ForgotPasswordSerializer(data=request.data)
 
         if serializer.is_valid():
-            return Response({"mensaje": "Enviamos un código OTP para restablecer tu contraseña"}, status=status.HTTP_200_OK)
+            user = serializer.validated_data["user"]
+            return Response({"mensaje": "Enviamos un código OTP para restablecer tu contraseña", "otp": user.otp_code}, status=status.HTTP_200_OK)
 
-        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ResetPasswordView(APIView):
@@ -201,6 +203,47 @@ class ResetPasswordView(APIView):
             return Response({"mensaje": "Contraseña restablecida correctamente"}, status=status.HTTP_200_OK)
 
         return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResendOTPPassView(APIView):
+    def post(self, request):
+        email = request.data.get('email', '').strip()
+        phone = request.data.get('phone', '').strip()
+
+        if not email and not phone:
+            return Response({"error": "Debes proporcionar un email o número de teléfono"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            if email:
+                user = CustomUser.objects.get(email=email, is_active=True)
+            else:
+                user = CustomUser.objects.get(phone=phone, is_active=True)
+
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Generar nuevo OTP
+        new_otp = CustomUser.create_otp()
+        user.otp_code = new_otp
+        user.otp_created_at = timezone.now()
+        user.save()
+
+        # Metodo de envio
+        metodo = method(user)
+        try:
+            if metodo == 'email':
+                forgot_password_email(user)
+                mensaje = "Nuevo código OTP enviado a tu correo electrónico."
+            elif metodo == 'sms':
+                forgot_password_sms(user)
+                mensaje = "Nuevo código OTP enviado a tu número telefónico."
+            else:
+                return Response({"error": "No se pudo determinar el método de envío"}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({"mensaje": mensaje, "otp": user.otp_code}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": f"No se pudo enviar el OTP por {metodo}: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ProfileUpdateView(APIView):
