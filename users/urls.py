@@ -12,7 +12,15 @@ from users.views import (InitialRegisterView,
                          ResetPasswordView,
                          ProfileUpdateView,
                          ProfileView,
-                         ResendOTPPassView)
+                         ResendOTPPassView,
+                         AddEmailView,
+                         ChangeEmailView,
+                         VerifyEmailOtpView,
+                         AddPhoneView,
+                         ChangePhoneView,
+                         VerifyPhoneOtpView,
+                         ResendOtpProfileView,
+                         DeleteUserView)
 
 urlpatterns = [
     # Register
@@ -37,4 +45,18 @@ urlpatterns = [
     # Profile
     path('profile/', ProfileView.as_view(), name='profile'),
     path('profile/update/', ProfileUpdateView.as_view(), name='profile_update'),
+
+    # email
+    path('profile/add/email/', AddEmailView.as_view(), name='add_email'),
+    path('profile/change/email/', ChangeEmailView.as_view(), name='change_email'),
+    path('profile/email/otp/', VerifyEmailOtpView.as_view(), name='verify_otp'),
+    # phone
+    path('profile/add/phone/', AddPhoneView.as_view(), name='add_phone'),
+    path('profile/change/phone/', ChangePhoneView.as_view(), name='change_phone'),
+    path('profile/phone/otp/', VerifyPhoneOtpView.as_view(), name='verify_otp'),
+    # otp
+    path('profile/otp/resend/', ResendOtpProfileView.as_view(), name='resend_otp'),
+
+    # Delete
+    path('delete/', DeleteUserView.as_view(), name='delete_user'),
 ]
