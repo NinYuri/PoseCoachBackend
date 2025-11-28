@@ -89,8 +89,12 @@ WSGI_APPLICATION = 'pcbackend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
 
@@ -138,13 +142,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # SENDGRID
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
-EMAIL_HOST_USER = os.getenv("DEFAULT_FROM_EMAIL", "yurianamontserrath2003@gmail.com")
+EMAIL_HOST_USER = os.getenv("DEFAULT_FROM_EMAIL")
 
 ANYMAIL = {
     "SENDGRID_API_KEY": os.getenv("SENDGRID_API_KEY"),
 }
 
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "yurianamontserrath2003@gmail.com")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
 # VONAGE
 VONAGE_API_KEY = os.getenv("VONAGE_API_KEY")
